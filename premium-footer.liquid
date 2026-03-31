@@ -1,0 +1,624 @@
+{%- liquid
+  assign social_blocks = section.blocks | where: 'type', 'social_icon'
+  assign payment_blocks = section.blocks | where: 'type', 'payment_icon'
+  assign menu_links = linklists[section.settings.menu].links
+-%}
+
+<footer
+  id="sk-footer-{{ section.id }}"
+  class="sk-footer"
+  role="contentinfo"
+  style="
+    --sk-bg:           {{ section.settings.background_color | default: '#ffffff' }};
+    --sk-color:        {{ section.settings.text_color | default: '#121212' }};
+    --sk-divider:      {{ section.settings.divider_color | default: '#e8e8e8' }};
+    --sk-link-hover:   {{ section.settings.link_hover_color | default: '#5a31f4' }};
+    --sk-follow-bg:    {{ section.settings.follow_btn_bg | default: '#5a31f4' }};
+    --sk-follow-fg:    {{ section.settings.follow_btn_color | default: '#ffffff' }};
+    --sk-follow-hover: {{ section.settings.follow_btn_hover | default: '#4322c7' }};
+    --sk-max:          {{ section.settings.container_width | default: 1400 }}px;
+    --sk-pt:           {{ section.settings.padding_top | default: 80 }}px;
+    --sk-pb:           {{ section.settings.padding_bottom | default: 40 }}px;
+  "
+>
+  <div class="sk-footer__wrap">
+    {%- comment -%}════ TOP ROW ════{%- endcomment -%}
+    <div class="sk-footer__top">
+      {%- comment -%} LEFT: MENU {%- endcomment -%}
+      <div class="sk-footer__col sk-footer__col--menu">
+        {%- if section.settings.menu_title != blank -%}
+          <p class="sk-footer__label">{{ section.settings.menu_title | escape }}</p>
+        {%- endif -%}
+
+        {%- if menu_links.size > 0 -%}
+          <nav class="sk-footer__nav">
+            {%- for link in menu_links -%}
+              <a href="{{ link.url }}" class="sk-footer__link">{{ link.title }}</a>
+            {%- endfor -%}
+          </nav>
+        {%- endif -%}
+      </div>
+
+      {%- comment -%} RIGHT: BRAND BOX {%- endcomment -%}
+      <div class="sk-footer__col sk-footer__col--brand">
+        <div class="sk-footer__brand-card">
+          {%- if section.settings.brand_title != blank -%}
+            <p class="sk-footer__label">{{ section.settings.brand_title | escape }}</p>
+          {%- endif -%}
+
+          {%- if section.settings.brand_description != blank -%}
+            <div class="sk-footer__brand-info">
+              {{ section.settings.brand_description }}
+            </div>
+          {%- endif -%}
+
+          {%- if section.settings.follow_button_text != blank -%}
+            <a href="{{ section.settings.follow_button_link | default: '#' }}" class="sk-footer__shop-btn">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+              </svg>
+              <span>{{ section.settings.follow_button_text }}</span>
+            </a>
+          {%- endif -%}
+        </div>
+      </div>
+    </div>
+
+    {%- comment -%} Socials {%- endcomment -%}
+    <div class="sk-footer__social-list">
+      {%- for block in social_blocks -%}
+        <a href="{{ block.settings.link }}" class="sk-footer__social-icon" {{ block.shopify_attributes }}>
+          {%- if block.settings.icon_svg != blank -%}{{ block.settings.icon_svg }}{%- endif -%}
+        </a>
+      {%- endfor -%}
+    </div>
+
+    {%- comment -%}════ BOTTOM ROW ════{%- endcomment -%}
+    <div class="sk-footer__bottom">
+      <div class="sk-footer__bottom-left">
+        {%- if section.settings.show_currency_selector -%}
+          <div class="sk-premium-selector">
+            <div class="sk-selector-container">
+              <button class="sk-selector-trigger" aria-expanded="false" data-selector-toggle>
+                <div class="sk-selector-current">
+                  {%- assign first_block = section.blocks | where: 'type', 'currency_option' | first -%}
+                  {%- if first_block.settings.flag_image != blank -%}
+                    <img
+                      src="{{ first_block.settings.flag_image | image_url: width: 40 }}"
+                      alt="flag"
+                      class="sk-main-flag"
+                    >
+                  {%- endif -%}
+                  <span class="sk-current-label">
+                    {{- first_block.settings.country_name | default: 'Select Country' | upcase -}}
+                  </span>
+                </div>
+                <svg
+                  class="sk-arrow-icon"
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                >
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </button>
+
+              <ul class="sk-selector-dropdown" hidden>
+                {%- for block in section.blocks -%}
+                  {%- if block.type == 'currency_option' -%}
+                    <li class="sk-selector-item" {{ block.shopify_attributes }}>
+                      <a href="{{ block.settings.link }}" class="sk-selector-link">
+                        {%- if block.settings.flag_image != blank -%}
+                          <img src="{{ block.settings.flag_image | image_url: width: 40 }}" alt="flag">
+                        {%- endif -%}
+                        <span>{{ block.settings.country_name }}</span>
+                      </a>
+                    </li>
+                  {%- endif -%}
+                {%- endfor -%}
+              </ul>
+            </div>
+          </div>
+        {%- endif -%}
+      </div>
+
+      <div class="sk-footer__bottom-center">
+        <p class="sk-footer__copy">
+          © {{ 'now' | date: '%Y' }} - {{ section.settings.copyright_text | default: shop.name | upcase }} POWERED BY
+          SHOPIFY
+        </p>
+      </div>
+
+      <div class="sk-footer__bottom-right">
+        <div class="sk-footer__payment-icons">
+          {%- for block in payment_blocks -%}
+            <div class="sk-footer__payment-item" {{ block.shopify_attributes }}>
+              {%- if block.settings.payment_image != blank -%}
+                <img src="{{ block.settings.payment_image | image_url: width: 100 }}" alt="payment" loading="lazy">
+              {%- endif -%}
+              {%- if block.settings.tooltip != blank -%}
+                <span class="sk-payment-tooltip">{{ block.settings.tooltip }}</span>
+              {%- endif -%}
+            </div>
+          {%- endfor -%}
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<style>
+    .sk-footer {
+      background-color: var(--sk-bg);
+      color: var(--sk-color);
+      padding: var(--sk-pt) 0 var(--sk-pb);
+      font-family: inherit;
+      border-top: 1px solid var(--sk-divider);
+      overflow: hidden;
+    }
+    .sk-footer__wrap {
+      max-width: var(--sk-max);
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    .sk-footer__top {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 45px;
+      gap: 40px;
+    }
+    .sk-footer__label {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 25px;
+      display: block;
+    }
+    .sk-footer__nav {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .sk-footer__link {
+      color: var(--sk-color);
+      text-decoration: none;
+      font-size: 14px;
+      opacity: 0.7;
+      transition: all 0.3s ease;
+      display: inline-block;
+    }
+    .sk-footer__link:hover {
+      opacity: 1;
+      transform: translateX(5px);
+      color: var(--sk-link-hover);
+    }
+
+    /* Brand Box */
+    .sk-footer__col--brand { max-width: 450px; }
+    .sk-footer__brand-card {
+      border: 1px solid var(--sk-divider);
+      padding-top: 30px;
+      border-radius: 4px;
+    }
+    .sk-footer__brand-info {
+      font-size: 14px;
+      line-height: 1.6;
+      opacity: 0.8;
+      margin-bottom: 20px;
+    }
+    .sk-footer__shop-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--sk-follow-bg);
+      color: var(--sk-follow-fg);
+      padding: 12px 25px;
+      border-radius: 50px;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .sk-footer__shop-btn:hover {
+      background: var(--sk-follow-hover);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+
+    /* Bottom Row */
+    .sk-footer__bottom {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      padding-top: 30px;
+      gap: 20px;
+    }
+    .sk-footer__bottom-left { display: flex; flex-direction: column; }
+    .sk-footer__social-list { display: flex; gap: 20px; margin-bottom: 20px; }
+    .sk-footer__social-icon svg { width: 20px; transition: 0.3s; }
+    .sk-footer__social-icon:hover svg { transform: scale(1.2); color: var(--sk-link-hover); }
+
+    .sk-footer__copy { font-size: 11px; letter-spacing: 1px; opacity: 0.6; text-align: center; }
+
+    /* Payment Tooltip & Icons */
+    .sk-footer__payment-icons {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+    }
+    .sk-footer__payment-item {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .sk-footer__payment-item img {
+      height: 24px;
+      transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: block;
+    }
+
+    .sk-payment-tooltip {
+      position: absolute;
+      bottom: 140%;
+      left: 50%;
+      transform: translateX(-50%) translateY(10px);
+      background: #1a1a1a;
+      color: #fff;
+      padding: 5px 10px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 600;
+      white-space: nowrap;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      pointer-events: none;
+      z-index: 10;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    /* Tooltip Arrow */
+    .sk-payment-tooltip::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border-width: 5px;
+      border-style: solid;
+      border-color: #1a1a1a transparent transparent transparent;
+    }
+
+    .sk-footer__payment-item:hover .sk-payment-tooltip {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(-50%) translateY(0);
+    }
+    .sk-footer__payment-item:hover img {
+      transform: translateY(-3px);
+    }
+
+    /* Currency Selector */
+    .sk-premium-selector { position: relative; }
+    .sk-selector-trigger {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: transparent;
+      padding: 8px 5px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .sk-main-flag {
+        width: 20px;
+        height: auto; }
+    .sk-current-label { font-size: 11px; font-weight: 700; letter-spacing: 1px; color: var(--sk-color); }
+    .sk-arrow-icon { transition: 0.3s; opacity: 0.6; }
+    .sk-selector-trigger[aria-expanded="true"] .sk-arrow-icon { transform: rotate(180deg); }
+
+    .sk-selector-dropdown {
+      position: absolute;
+      bottom: calc(100% + 10px);
+      left: 0;
+      width: 220px;
+      background: #fff;
+      border: 1px solid var(--sk-divider);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      list-style: none;
+      padding: 5px 0;
+      z-index: 50;
+      border-radius: 4px;
+    }
+    .sk-selector-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 15px;
+      text-decoration: none;
+      color: #444;
+      font-size: 12px;
+      transition: 0.2s;
+    }
+    .sk-selector-link:hover { background: #f5f5f5; color: #000; }
+    .sk-selector-link img { width: 16px; }
+
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+      .sk-footer__top { flex-direction: column; gap: 40px; }
+      .sk-footer__col--brand { max-width: 100%; }
+      .sk-footer__bottom {
+        grid-template-columns: 1fr;
+        text-align: center;
+        gap: 30px;
+        padding-top: 40px;
+      }
+      .sk-footer__bottom-left,
+      .sk-footer__payment-icons,
+      .sk-footer__social-list {
+        justify-content: center;
+        align-items: center;
+      }
+      .sk-footer__social-list { margin-bottom: 0; }
+      .sk-footer__bottom-center { order: 3; }
+      .sk-footer__bottom-right { order: 2; }
+      .sk-footer__bottom-left { order: 1; }
+    }
+
+    @media (max-width: 767px) {
+      .sk-footer { --sk-pt: 50px; --sk-pb: 30px; }
+      .sk-footer__label { margin-bottom: 15px; }
+      {% comment %} .sk-footer__brand-card { padding: 20px; } {% endcomment %}
+      .sk-footer__payment-icons { gap: 10px; }
+      .sk-footer__col--menu {
+        text-align: left;
+        margin: auto;
+    }
+    }
+
+    .sk-selector-current {
+      display: flex;
+      gap: 15px;
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const trigger = document.querySelector('[data-selector-toggle]');
+    const dropdown = document.querySelector('.sk-selector-dropdown');
+
+    if (trigger && dropdown) {
+      trigger.addEventListener('click', function (e) {
+        e.stopPropagation();
+        const isExpanded = this.getAttribute('aria-expanded') === 'true';
+        this.setAttribute('aria-expanded', !isExpanded);
+        dropdown.hidden = isExpanded;
+      });
+
+      document.addEventListener('click', function () {
+        trigger.setAttribute('aria-expanded', 'false');
+        dropdown.hidden = true;
+      });
+    }
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Premium Footer",
+  "tag": "section",
+  "class": "sk-footer-section",
+  "limit": 1,
+  "settings": [
+    {
+      "type": "header",
+      "content": "⚙️ Container & Spacing"
+    },
+    {
+      "type": "range",
+      "id": "container_width",
+      "label": "Max container width",
+      "min": 960,
+      "max": 1920,
+      "step": 20,
+      "default": 1800,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding top",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "default": 60,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding bottom",
+      "min": 0,
+      "max": 160,
+      "step": 2,
+      "default": 30,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "🎨 Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Footer background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text & icon color",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "color",
+      "id": "divider_color",
+      "label": "Divider / border color",
+      "default": "#e8e8e8"
+    },
+    {
+      "type": "color",
+      "id": "link_hover_color",
+      "label": "Link hover color",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "header",
+      "content": "📋 Navigation Menu"
+    },
+    {
+      "type": "text",
+      "id": "menu_title",
+      "label": "Section heading",
+      "default": "FOOTER MENU"
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Select footer menu",
+      "default": "footer"
+    },
+    {
+      "type": "header",
+      "content": "🏷️ Brand Block (Right Side)"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_currency_selector",
+      "label": "Show Custom Currency Selector",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "brand_title",
+      "label": "Brand / store name",
+      "default": "SAINT KAIZEN"
+    },
+    {
+      "type": "richtext",
+      "id": "brand_description",
+      "label": "Brand description",
+      "default": "<p>We believe in the power of purpose-driven workout wear.</p>"
+    },
+    {
+      "type": "header",
+      "content": "❤️ Follow Button"
+    },
+    {
+      "type": "text",
+      "id": "follow_button_text",
+      "label": "Button label",
+      "default": "Follow on shop"
+    },
+    {
+      "type": "url",
+      "id": "follow_button_link",
+      "label": "Button destination URL"
+    },
+    {
+      "type": "color",
+      "id": "follow_btn_bg",
+      "label": "Button background",
+      "default": "#5c6bc0"
+    },
+    {
+      "type": "color",
+      "id": "follow_btn_color",
+      "label": "Button text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "follow_btn_hover",
+      "label": "Button hover background",
+      "default": "#4a5ab0"
+    },
+    {
+      "type": "header",
+      "content": "© Copyright"
+    },
+    {
+      "type": "text",
+      "id": "copyright_text",
+      "label": "Copyright line",
+      "default": "FOOTPRINTS OF FAITH"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "currency_option",
+      "name": "Country Option",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "flag_image",
+          "label": "Country Flag"
+        },
+        {
+          "type": "text",
+          "id": "country_name",
+          "label": "Display Name",
+          "default": "United States (USD $)"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link (Optional)"
+        }
+      ]
+    },
+    {
+      "type": "social_icon",
+      "name": "Social Icon",
+      "settings": [
+        {
+          "type": "html",
+          "id": "icon_svg",
+          "label": "SVG icon code"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Profile or page URL"
+        }
+      ]
+    },
+    {
+      "type": "payment_icon",
+      "name": "Payment Icon",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "payment_image",
+          "label": "Payment badge image"
+        },
+        {
+          "type": "text",
+          "id": "tooltip",
+          "label": "Payment method name (tooltip)",
+          "default": "Visa"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Premium Footer"
+    }
+  ]
+}
+{% endschema %}
