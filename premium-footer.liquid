@@ -62,7 +62,6 @@
       </div>
     </div>
 
-    {%- comment -%} Socials {%- endcomment -%}
     <div class="sk-footer__social-list">
       {%- for block in social_blocks -%}
         <a href="{{ block.settings.link }}" class="sk-footer__social-icon" {{ block.shopify_attributes }}>
@@ -71,7 +70,6 @@
       {%- endfor -%}
     </div>
 
-    {%- comment -%}════ BOTTOM ROW ════{%- endcomment -%}
     <div class="sk-footer__bottom">
       <div class="sk-footer__bottom-left">
         {%- if section.settings.show_currency_selector -%}
